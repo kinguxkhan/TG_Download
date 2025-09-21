@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Downloader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Media Downloader</h1>
+            <p>Download videos and audio from TikTok, Instagram, Reddit, Facebook, Snapchat, and SoundCloud</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="media-url">Enter URL</label>
+                <input type="text" id="media-url" placeholder="Paste link here">
+                <div class="platform-icons">
+                    <span class="platform-icon" data-platform="tiktok"> TikTok</span>
+                    <span class="platform-icon" data-platform="instagram"> Instagram</span>
+                    <span class="platform-icon" data-platform="reddit"> Reddit</span>
+                    <span class="platform-icon" data-platform="facebook"> Facebook</span>
+                    <span class="platform-icon" data-platform="snapchat"> Snapchat</span>
+                    <span class="platform-icon" data-platform="soundcloud"> SoundCloud</span>
+                </div>
+            </div>
+            
+            <button id="download-btn">Download Content</button>
+            
+            <div class="result" id="download-result">
+                <div id="result-content"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Social Media Downloader &copy; 2023</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
