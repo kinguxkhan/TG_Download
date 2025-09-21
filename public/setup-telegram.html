@@ -10,63 +10,127 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
         }
         h1 {
             color: #0088cc;
+            text-align: center;
+            margin-bottom: 20px;
         }
         input, button {
-            padding: 10px;
+            padding: 12px 15px;
             margin: 10px 0;
             width: 100%;
             box-sizing: border-box;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+        }
+        input:focus {
+            border-color: #0088cc;
+            outline: none;
         }
         button {
             background-color: #0088cc;
             color: white;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0066aa;
         }
         #result {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
         }
         .success {
             background-color: #d4edda;
             color: #155724;
+            border: 1px solid #c3e6cb;
         }
         .error {
             background-color: #f8d7da;
             color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        #debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Telegram Bot Setup</h1>
-        <p>Enter your Telegram bot token to set up the webhook:</p>
         
-        <input type="text" id="bot-token" placeholder="Bot Token">
-        <input type="hidden" id="webhook-url" value="https://your-vercel-app.vercel.app">
+        <div class="instructions">
+            <h3>How to get your bot token:</h3>
+            <ol>
+                <li>Open Telegram and search for <strong>@BotFather</strong></li>
+                <li>Start a chat and send <code>/newbot</code></li>
+                <li>Follow the instructions to name your bot</li>
+                <li>Copy the API token you receive</li>
+                <li>Paste it in the field below</li>
+            </ol>
+        </div>
+        
+        <input type="text" id="bot-token" placeholder="Paste your bot token here">
+        <input type="hidden" id="webhook-url">
         
         <button onclick="setWebhook()">Set Webhook</button>
         
         <div id="result"></div>
+        
+        <button onclick="toggleDebug()" style="margin-top: 20px; background-color: #6c757d;">Show Debug Info</button>
+        
+        <div id="debug-info" class="hidden"></div>
     </div>
 
     <script>
+        // Auto-fill the webhook URL with the current domain
+        document.getElementById('webhook-url').value = window.location.origin;
+        
+        function toggleDebug() {
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.classList.toggle('hidden');
+        }
+        
         async function setWebhook() {
             const token = document.getElementById('bot-token').value;
             const url = document.getElementById('webhook-url').value;
             const resultDiv = document.getElementById('result');
+            const debugInfo = document.getElementById('debug-info');
             
             if (!token) {
                 resultDiv.className = 'error';
@@ -75,6 +139,9 @@
             }
             
             try {
+                resultDiv.className = '';
+                resultDiv.innerHTML = 'Setting up webhook...';
+                
                 const response = await fetch('/api/set-webhook', {
                     method: 'POST',
                     headers: {
@@ -83,23 +150,37 @@
                     body: JSON.stringify({ token, url })
                 });
                 
-                const data = await response.json();
+                // Get response text first to handle both JSON and non-JSON responses
+                const responseText = await response.text();
+                debugInfo.textContent = `Response: ${responseText}\nStatus: ${response.status}`;
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 100)}...`);
+                }
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `Server returned status ${response.status}`);
+                }
                 
                 if (data.ok) {
                     resultDiv.className = 'success';
-                    resultDiv.innerHTML = 'Webhook set successfully! Your bot is now ready to use.';
+                    resultDiv.innerHTML = '✅ Webhook set successfully!<br>Your bot is now ready to use.<br>Start chatting with your bot on Telegram.';
                 } else {
                     resultDiv.className = 'error';
-                    resultDiv.innerHTML = `Error: ${data.description}`;
+                    resultDiv.innerHTML = `Error: ${data.description || 'Unknown error'}`;
                 }
             } catch (error) {
+                console.error('Error setting webhook:', error);
                 resultDiv.className = 'error';
                 resultDiv.innerHTML = 'Error setting webhook: ' + error.message;
+                
+                // Show debug info on error
+                debugInfo.classList.remove('hidden');
             }
         }
-        
-        // Auto-fill the webhook URL with the current domain
-        document.getElementById('webhook-url').value = window.location.origin;
     </script>
 </body>
-</html>
+            </html>
