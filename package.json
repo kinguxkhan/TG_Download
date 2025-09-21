@@ -1,0 +1,12 @@
+{
+  "name": "social-media-downloader",
+  "version": "1.0.0",
+  "description": "Download content from various social media platforms with Telegram integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "telegraf": "^4.11.2"
+  }
+}
