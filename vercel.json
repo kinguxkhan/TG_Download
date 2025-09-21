@@ -1,4 +1,4 @@
-{{
+{
   "version": 2,
   "builds": [
     { "src": "api/**/*.js", "use": "@vercel/node" },
@@ -7,8 +7,5 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/public/$1" }
-  ],
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token"
-  }
+  ]
 }
